@@ -2,20 +2,203 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Systems CFPs</title>
-    <!-- <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-        crossorigin="anonymous">
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script> -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Systems Conference CFPs</title>
+    <style>
+        #main-content {
+            max-width: 80%;
+            margin: auto;
+            padding: 20px;
+            font-family: sans-serif;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        /* Set consistent width for date columns */
+        th.date-col,
+        td.date-col {
+            width: 100px;
+            text-align: center;
+        }
+
+        /* Set consistent width for Days to Paper Due column */
+        th.days-col,
+        td.days-col {
+            width: 90px;
+            /* Fixed width for days column */
+            text-align: center;
+        }
+
+        /* Left-aligned first column */
+        .left-align {
+            text-align: left;
+            width: 250px;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
 </head>
 
 <body>
-    <p>TODO</p>
+
+    <div id="main-content">
+        <h1>Systems Conference Call for Papers</h1>
+
+        <p>This is a short list of systems conferences and their deadlines for
+            easy perusal. If any entries are wrong or missing, submit a PR <a
+                href="https://github.com/IsaacKhor/cscfp.org">here</a>. Contributions are very welcome.</p>
+
+        <!-- Future Deadlines Table -->
+        <h2>Upcoming Deadlines</h2>
+        <table id="future-conference-table">
+            <thead>
+                <tr>
+                    <th class="left-align">Conference Name</th>
+                    <th class="date-col">Abstract Due</th>
+                    <th class="date-col">Paper Due</th>
+                    <th class="date-col">Notification</th>
+                    <th class="days-col">Due (days)</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic content for future conferences will be inserted here -->
+            </tbody>
+        </table>
+
+        <!-- Past Deadlines Table -->
+        <h2>Past Deadlines</h2>
+        <table id="past-conference-table">
+            <thead>
+                <tr>
+                    <th class="left-align">Conference Name</th>
+                    <th class="date-col">Abstract Due</th>
+                    <th class="date-col">Paper Due</th>
+                    <th class="date-col">Notification</th>
+                    <th class="days-col">Due (days)</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic content for past conferences will be inserted here -->
+            </tbody>
+        </table>
+
+    </div>
+
+    <script>
+        // Function to fetch and process the CSV data
+        async function loadConferenceData() {
+            const csvUrl = '/cfp.csv';
+
+            try {
+                // Fetch the CSV file
+                const response = await fetch(csvUrl);
+                const text = await response.text();
+
+                // Parse the CSV data into rows
+                const rows = text.split('\n').map(row => row.split(','));
+
+                // Table body references
+                const futureTableBody = document.querySelector('#future-conference-table tbody');
+                const pastTableBody = document.querySelector('#past-conference-table tbody');
+
+                // Get today's date
+                const today = new Date();
+
+                // Arrays to store past and future conferences
+                const futureConferences = [];
+                const pastConferences = [];
+
+                // Iterate over each row of the CSV
+                rows.forEach((row, index) => {
+                    if (index === 0) return; // Skip the header row
+
+                    const [
+                        confName, cfpLink, abstractDue, submissionDue, authorNotif,
+                        confStart, confEnd, confLoc, notes
+                    ] = row;
+
+                    if (!confName) return; // Skip empty rows
+
+                    // Parse dates
+                    const abstractDueDate = new Date(abstractDue);
+                    const submissionDueDate = new Date(submissionDue);
+                    const authorNotifDate = new Date(authorNotif);
+                    const daysToPaperDue = Math.ceil((submissionDueDate - today) / (1000 * 3600 * 24)); // Days difference
+
+                    // Organize conferences based on due date
+                    const conferenceData = {
+                        confName,
+                        cfpLink,
+                        abstractDue: abstractDue || '-',
+                        submissionDue: submissionDue || '-',
+                        authorNotif: authorNotif || '-',
+                        daysToPaperDue: daysToPaperDue >= 0 ? daysToPaperDue : '-',
+                        notes: notes || '-',
+                        submissionDueDate
+                    };
+
+                    if (daysToPaperDue >= 0) {
+                        futureConferences.push(conferenceData);
+                    } else {
+                        pastConferences.push(conferenceData);
+                    }
+                });
+
+                // Sort conferences: future in ascending order, past in descending order
+                futureConferences.sort((a, b) => a.submissionDueDate - b.submissionDueDate);
+                pastConferences.sort((a, b) => b.submissionDueDate - a.submissionDueDate);
+
+                // Function to create and append rows
+                function appendConferenceRows(tableBody, conferences) {
+                    conferences.forEach(conf => {
+                        const rowElement = document.createElement('tr');
+                        rowElement.innerHTML = `
+                            <td class="left-align"><a href="${conf.cfpLink}" target="_blank">${conf.confName}</a></td>
+                            <td class="date-col">${conf.abstractDue}</td>
+                            <td class="date-col">${conf.submissionDue}</td>
+                            <td class="date-col">${conf.authorNotif}</td>
+                            <td class="days-col">${conf.daysToPaperDue}</td>
+                            <td>${conf.notes}</td>
+                        `;
+                        tableBody.appendChild(rowElement);
+                    });
+                }
+
+                // Append sorted rows to respective tables
+                appendConferenceRows(futureTableBody, futureConferences);
+                appendConferenceRows(pastTableBody, pastConferences);
+
+            } catch (error) {
+                console.error('Error loading or parsing CSV data:', error);
+            }
+        }
+
+        // Load the data on page load
+        window.onload = loadConferenceData;
+    </script>
+
 </body>
+
+</html>
