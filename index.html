@@ -107,6 +107,11 @@
     </div>
 
     <script>
+        function getDate(dateString) {
+            const [year, month, day] = dateString.split('.').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
         // Function to fetch and process the CSV data
         async function loadConferenceData() {
             const csvUrl = '/cfp.csv';
@@ -142,9 +147,9 @@
                     if (!confName) return; // Skip empty rows
 
                     // Parse dates
-                    const abstractDueDate = new Date(Date(abstractDue));
-                    const submissionDueDate = new Date(Date(submissionDue));
-                    const authorNotifDate = new Date(Date(authorNotif));
+                    const abstractDueDate = getDate(abstractDue);
+                    const submissionDueDate = getDate(submissionDue);
+                    const authorNotifDate = getDate(authorNotif);
                     const daysToPaperDue = Math.ceil((submissionDueDate - today) / (1000 * 3600 * 24)); // Days difference
 
                     // Organize conferences based on due date
