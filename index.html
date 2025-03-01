@@ -142,9 +142,9 @@
                     if (!confName) return; // Skip empty rows
 
                     // Parse dates
-                    const abstractDueDate = new Date(abstractDue);
-                    const submissionDueDate = new Date(submissionDue);
-                    const authorNotifDate = new Date(authorNotif);
+                    const abstractDueDate = new Date(Date(abstractDue));
+                    const submissionDueDate = new Date(Date(submissionDue));
+                    const authorNotifDate = new Date(Date(authorNotif));
                     const daysToPaperDue = Math.ceil((submissionDueDate - today) / (1000 * 3600 * 24)); // Days difference
 
                     // Organize conferences based on due date
