@@ -66,7 +66,8 @@
 
         <p>This is a short list of systems conferences and their deadlines for
             easy perusal. If any entries are wrong or missing, submit a PR <a
-                href="https://github.com/IsaacKhor/cscfp.org">here</a>. Contributions are very welcome.</p>
+                href="https://github.com/IsaacKhor/cscfp.org">here</a>.
+            Contributions are very welcome.</p>
 
         <!-- Future Deadlines Table -->
         <h2>Upcoming Deadlines</h2>
@@ -74,11 +75,11 @@
             <thead>
                 <tr>
                     <th class="left-align">Conference Name</th>
-                    <th class="date-col">Abstract Due</th>
                     <th class="date-col">Paper Due</th>
                     <th class="date-col">Notification</th>
-                    <th class="days-col">Due (days)</th>
-                    <th>Notes</th>
+                    <th class="days-col">Days to Deadline</th>
+                    <th class="days-col">Conference Date</th>
+                    <th>Location</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,11 +93,11 @@
             <thead>
                 <tr>
                     <th class="left-align">Conference Name</th>
-                    <th class="date-col">Abstract Due</th>
                     <th class="date-col">Paper Due</th>
                     <th class="date-col">Notification</th>
-                    <th class="days-col">Due (days)</th>
-                    <th>Notes</th>
+                    <th class="days-col">Days to Conference</th>
+                    <th class="days-col">Conference Date</th>
+                    <th>Location</th>
                 </tr>
             </thead>
             <tbody>
@@ -140,31 +141,33 @@
                     if (index === 0) return; // Skip the header row
 
                     const [
-                        confName, cfpLink, abstractDue, submissionDue, authorNotif,
-                        confStart, confEnd, confLoc, notes
+                        confName, cfpLink, submissionDue, authorNotif,
+                        confStart, confLoc, notes
                     ] = row;
 
                     if (!confName) return; // Skip empty rows
 
                     // Parse dates
-                    const abstractDueDate = getDate(abstractDue);
                     const submissionDueDate = getDate(submissionDue);
                     const authorNotifDate = getDate(authorNotif);
-                    const daysToPaperDue = Math.ceil((submissionDueDate - today) / (1000 * 3600 * 24)); // Days difference
+                    const confStartDate = getDate(confStart);
+                    const daysToDue = Math.ceil((submissionDueDate - today) / (1000 * 3600 * 24)); // Days difference
+                    const daysToConf = Math.ceil((confStartDate - today) / (1000 * 3600 * 24)); // Days difference
 
                     // Organize conferences based on due date
                     const conferenceData = {
                         confName,
                         cfpLink,
-                        abstractDue: abstractDue || '-',
                         submissionDue: submissionDue || '-',
                         authorNotif: authorNotif || '-',
-                        daysToPaperDue: daysToPaperDue >= 0 ? daysToPaperDue : '-',
-                        notes: notes || '-',
-                        submissionDueDate
+                        daysLeft: daysToDue >= 0 ? daysToDue : daysToConf,
+                        confStart: confStart || '-',
+                        confLoc: confLoc || '-',
+                        submissionDueDate,
+                        confStartDate,
                     };
 
-                    if (daysToPaperDue >= 0) {
+                    if (daysToDue >= 0) {
                         futureConferences.push(conferenceData);
                     } else {
                         pastConferences.push(conferenceData);
@@ -173,7 +176,7 @@
 
                 // Sort conferences: future in ascending order, past in descending order
                 futureConferences.sort((a, b) => a.submissionDueDate - b.submissionDueDate);
-                pastConferences.sort((a, b) => b.submissionDueDate - a.submissionDueDate);
+                pastConferences.sort((a, b) => b.confStartDate - a.confStartDate);
 
                 // Function to create and append rows
                 function appendConferenceRows(tableBody, conferences) {
@@ -181,11 +184,11 @@
                         const rowElement = document.createElement('tr');
                         rowElement.innerHTML = `
                             <td class="left-align"><a href="${conf.cfpLink}" target="_blank">${conf.confName}</a></td>
-                            <td class="date-col">${conf.abstractDue}</td>
                             <td class="date-col">${conf.submissionDue}</td>
                             <td class="date-col">${conf.authorNotif}</td>
-                            <td class="days-col">${conf.daysToPaperDue}</td>
-                            <td>${conf.notes}</td>
+                            <td class="days-col">${conf.daysLeft > 0 ? conf.daysLeft : '-'}</td>
+                            <td class="days-col">${conf.confStart}</td>
+                            <td>${conf.confLoc}</td>
                         `;
                         tableBody.appendChild(rowElement);
                     });
