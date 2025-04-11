@@ -176,7 +176,7 @@
 
                 // Sort conferences: future in ascending order, past in descending order
                 futureConferences.sort((a, b) => a.submissionDueDate - b.submissionDueDate);
-                pastConferences.sort((a, b) => b.confStartDate - a.confStartDate);
+                pastConferences.sort((a, b) => b.submissionDueDate - a.submissionDueDate);
 
                 // Function to create and append rows
                 function appendConferenceRows(tableBody, conferences) {
