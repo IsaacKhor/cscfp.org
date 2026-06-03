@@ -56,6 +56,12 @@
             margin-top: 20px;
             font-size: 1.2em;
         }
+
+        #last-updated {
+            color: #555;
+            font-size: 0.95em;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -68,6 +74,8 @@
             easy perusal. If any entries are wrong or missing, submit a PR <a
                 href="https://github.com/IsaacKhor/cscfp.org">here</a>.
             Contributions are very welcome.</p>
+
+        <p id="last-updated">Last updated: -</p>
 
         <!-- Future Deadlines Table -->
         <h2>Upcoming Deadlines</h2>
@@ -111,6 +119,19 @@
         function getDate(dateString) {
             const [year, month, day] = dateString.split('.').map(Number);
             return new Date(year, month - 1, day);
+        }
+
+        async function loadLastUpdated() {
+            try {
+                const response = await fetch('/last-updated.txt');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const lastUpdated = (await response.text()).trim();
+                document.getElementById('last-updated').textContent =
+                    `Last updated: ${lastUpdated || '-'}`;
+            } catch (error) {
+                console.error('Error loading last-updated date:', error);
+            }
         }
 
         // Function to fetch and process the CSV data
@@ -204,7 +225,10 @@
         }
 
         // Load the data on page load
-        window.onload = loadConferenceData;
+        window.onload = () => {
+            loadLastUpdated();
+            loadConferenceData();
+        };
     </script>
 
 </body>

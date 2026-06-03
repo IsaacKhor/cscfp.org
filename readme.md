@@ -1,32 +1,27 @@
 # Source for cscfp.org
 
 This is the source for the [CSCFP](https://cscfp.org) website. It contains some
-of the conferences that I personaly follow to progress my PhD in CS systems.
+of the conferences that I personally follow to progress my PhD in CS systems.
 
-The database of CFP's and their deadlines is stored in a simple csv at 
-`cfps.csv`. If you want to add something, feel free to open a PR.
+The database of CFPs and their deadlines is stored in a simple CSV at
+`cfp.csv`. If you want to add something, feel free to open a PR.
 
-The main conferences that this includes:
+The conference series currently tracked in `cfp.csv` are:
 
-Usenix:
-
-- ATC
-- OSDI
-- NSDI
-- FAST
-
-Sigops/ACM:
-
-- SOSP
-- Eurosys
+- ApSys
 - ASPLOS
+- ATC
+- EuroSys
+- FAST
+- HotOS
+- HotStorage
+- ICPE
+- MASCOTS
+- NSDI
+- OSDI
 - SoCC
+- SOSP
+- Systor
 
-Todo:
-
-- [ ] ApSys
-- [ ] SC
-- [ ] HotStorage
-- [ ] HotOS
-- [ ] SigMOD
-- [ ] MSST (?)
+The website reads its last-updated date from `last-updated.txt`. Update that
+one-line file whenever the CSV or site content changes.
